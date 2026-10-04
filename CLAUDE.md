@@ -27,18 +27,18 @@
 - 상태 전이: PENDING → MATCHED → IN_PROGRESS → DONE
 - 핵심: 보호자가 지원자를 수락할 때 트랜잭션 + 비관적 락으로 중복 매칭 방지
 
-## 현재 진행 상황: Day 1 수업 완료, 확인 질문 답변 대기
-- ✅ 1교시: PHP 기초 (`docs/notes/day1-1-php-basics.md`)
-- ✅ 2교시: 프로젝트 생성, 폴더 구조, 요청 흐름, install:api (`docs/notes/day1-2-laravel-project-structure.md`)
-- ✅ 3교시: CareRequest CRUD API, curl 9개 시나리오 통과 (`docs/notes/day1-3-care-request-crud.md`)
-- ⏭ Day 1 확인 질문(1교시 퀴즈 3개 + 아래 4개)의 답을 받아 채점 → Day 2로
+## 현재 진행 상황: Day 2 - 1교시 완료, 2교시(Eloquent 관계) 차례
+Day 1 ✅ (노트 `docs/notes/day1-*.md`, 확인 질문 7/7 정답 → `day1-4-review.md`)
 
-Day 1 확인 질문: $fillable의 이유 / Route Model Binding 원리 / Accept 헤더 차이 / Spring이라면 어떻게 만들었을지
+Day 2
+- ✅ 1교시: 라우트 심화(개념), FormRequest, API Resource, Enum cast, 페이징과 필터 (`docs/notes/day2-1-request-response-layer.md`)
+- ⏭ 2교시: Eloquent 관계. users에 role 추가, applications 테이블, hasMany/belongsTo, 중첩 라우트
+- ⏭ 3교시: N+1 문제와 `with()` eager loading, 쿼리 로그로 확인
+- Day 2가 끝나면 확인 질문 3~4개
 
-Day 2에서 이어갈 숙제
-- update에서 날짜 앞뒤 검증이 빠져 있음 → FormRequest로 분리하며 개선
-- index를 `get()` → `paginate()`로, 정렬 기준에 id 추가
-- 한글 JSON 이스케이프(`JSON_UNESCAPED_UNICODE`)는 선택 사항
+미뤄 둔 결정
+- timezone: `config/app.php`가 UTC → `today()`가 한국 날짜보다 하루 늦을 수 있음. Day 3에서 Asia/Seoul로 바꿀지 결정
+- User 모델에 HasApiTokens 추가 → Day 4
 
 ## 진행 방식
 - 코드를 대신 다 짜주기보다, 단계별로 같이 만들고 주석으로 Spring 대응 개념을 달아준다.

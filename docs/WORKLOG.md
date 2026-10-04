@@ -119,3 +119,30 @@ php artisan make:model CareRequest -mcr --api
   - JSON 응답의 한글은 `\uXXXX`로 이스케이프된다(표준 동작).
 - `care-match/CLAUDE.md`가 Laravel Boost 설치를 권하지만 학습에는 필요 없어서 설치하지 않았다.
 - 강의 노트: `docs/notes/day1-3-care-request-crud.md`
+
+### 10. Day 1 확인 질문
+- 7문항 모두 정답. 보충 설명(Facade와 모델 `__callStatic`의 차이, 이 프로젝트의 Accept 헤더 동작 등)은 `docs/notes/day1-4-review.md`에 정리했다.
+
+---
+
+## 2026-10-05 (월) Day 2
+
+### 1. 1교시: FormRequest · API Resource · Enum · 페이징
+```bash
+cd care-match
+php artisan make:enum CareStatus --string     # app/CareStatus.php에 생성됨 → 삭제하고 app/Enums/CareStatus.php로 다시 작성
+php artisan make:request StoreCareRequestRequest
+php artisan make:request UpdateCareRequestRequest
+php artisan make:resource CareRequestResource
+```
+- 작성하거나 수정한 파일
+  - `app/Enums/CareStatus.php`: PENDING, MATCHED, IN_PROGRESS, DONE + `label()`
+  - `app/Http/Requests/StoreCareRequestRequest.php`: `authorize()` true(기본 false 함정), rules, 한글 `attributes()`, `start_date`는 `after_or_equal:today`
+  - `app/Http/Requests/UpdateCareRequestRequest.php`: `sometimes` 규칙 + `after()` 훅으로 기존 값과 날짜 비교(Day 1 숙제 해결)
+  - `app/Http/Resources/CareRequestResource.php`: 응답 필드 선택, `days` 계산, `status_label`, `updated_at` 숨김
+  - `app/Models/CareRequest.php`: status를 enum으로 cast
+  - `app/Http/Controllers/CareRequestController.php`: FormRequest와 Resource 적용, index에 `?status`, `?per_page` 필터와 `paginate`, `latest('id')` 보조 정렬
+- 테스트 데이터: tinker로 MATCHED 상태 1건 생성
+- curl 테스트 9개 시나리오 모두 통과: 201 자동 / 422(한글 필드명) / 페이징 meta / 상태 필터 / 422(enum) / 422(after 훅) / 422(형식 오류, 500 아님) / 200 / status 무시
+- 발견한 점: `config/app.php`의 timezone이 UTC라서 `today()`가 한국 날짜보다 하루 늦을 수 있다(한국 시간 00~09시). → Day 3에서 정책을 결정한다.
+- 강의 노트: `docs/notes/day2-1-request-response-layer.md`
