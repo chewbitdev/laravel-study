@@ -22,16 +22,20 @@
 | 10/11 (일) | 휴식, 케어네이션 앱 써보기, 첫 주 체크리스트 |
 
 ## 미니 프로젝트: care-match (간병 매칭 API)
-- 위치: 이 폴더 아래 `care-match/` (아직 생성 전)
+- 위치: 이 폴더 아래 `care-match/` (Laravel 13.34, PHP 8.5, SQLite, install:api 완료)
 - 테이블: users(보호자/간병인 role), care_requests(간병 요청), applications(간병인 지원)
 - 상태 전이: PENDING → MATCHED → IN_PROGRESS → DONE
 - 핵심: 보호자가 지원자를 수락할 때 트랜잭션 + 비관적 락으로 중복 매칭 방지
 
-## 현재 진행 상황: Day 1 시작 전
+## 현재 진행 상황: Day 1 - 2교시 완료, 3교시(CareRequest CRUD) 차례
+- ✅ 1교시: PHP 기초 (`docs/notes/day1-1-php-basics.md`)
+- ✅ 2교시: 프로젝트 생성, 폴더 구조, 요청 흐름, install:api (`docs/notes/day1-2-laravel-project-structure.md`)
+- ⏭ 3교시: 아래 4번부터
+
 Day 1에서 할 일:
-1. `brew install php composer` (없으면)
-2. 이 폴더에서 `composer create-project laravel/laravel care-match`
-3. `cd care-match && php artisan install:api` (마이그레이션 실행 yes)
+1. ~~`brew install php composer`~~ ✅
+2. ~~`composer create-project laravel/laravel care-match`~~ ✅
+3. ~~`php artisan install:api`~~ ✅ (HasApiTokens trait 추가는 Day 4에서)
 4. `php artisan make:model CareRequest -mcr --api`
 5. 작성할 코드
    - migration: id, patient_name(50), location, start_date, end_date, status(default PENDING), timestamps

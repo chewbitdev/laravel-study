@@ -57,3 +57,37 @@ gh repo create chewbitdev/laravel-study --public --source . --push
   ```bash
   php practice/day1-php-basics.php   # 7개 섹션 모두 정상 출력
   ```
+
+### 5. 2교시: Laravel 프로젝트 생성
+```bash
+composer create-project laravel/laravel care-match
+```
+- 결과: Laravel Framework **13.34.0**
+- 자동으로 실행된 것: `composer install`, `.env` 생성, `key:generate`, `database/database.sqlite` 생성, 기본 마이그레이션 3개(users, cache, jobs)
+- 기본 DB는 SQLite(`DB_CONNECTION=sqlite`)다. 학습용으로는 별도 DB 서버가 필요 없다.
+- `care-match/CLAUDE.md`와 `AGENTS.md`는 Laravel이 자동 생성한 AI 도구용 가이드 파일이다(laravel-boost). 이 학습용 CLAUDE.md와는 별개다.
+
+### 6. 개발 서버 실행과 확인
+```bash
+php artisan route:list
+php artisan serve                     # http://127.0.0.1:8000
+curl http://127.0.0.1:8000/           # 200 (welcome 페이지)
+curl http://127.0.0.1:8000/up         # 200 (헬스체크)
+curl http://127.0.0.1:8000/nope                                # HTML 404 페이지
+curl -H 'Accept: application/json' http://127.0.0.1:8000/nope  # JSON 404 + trace
+```
+- Accept 헤더에 따라 에러 응답 형식이 바뀌는 것을 확인했다.
+
+### 7. API 스캐폴딩 설치
+```bash
+php artisan install:api --no-interaction
+```
+- `routes/api.php`를 만들고 `bootstrap/app.php`에 `api:` 라우트를 등록했다.
+- Sanctum 패키지를 설치하고 `personal_access_tokens` 테이블 마이그레이션을 실행했다(batch 2).
+- 안내 메시지: User 모델에 `HasApiTokens` trait를 추가하라고 함 → **Day 4(Sanctum 인증)에서 진행**
+- 확인: `php artisan route:list --path=api` → `GET api/user`
+
+### 8. git 커밋 대상 확인
+- `.env`, `vendor/`, `database/database.sqlite`는 Laravel 기본 `.gitignore`가 제외해 준다. 커밋 전에 `git add -n`으로 빠지는 것을 확인했다.
+
+- 강의 노트: `docs/notes/day1-2-laravel-project-structure.md`
