@@ -27,23 +27,18 @@
 - 상태 전이: PENDING → MATCHED → IN_PROGRESS → DONE
 - 핵심: 보호자가 지원자를 수락할 때 트랜잭션 + 비관적 락으로 중복 매칭 방지
 
-## 현재 진행 상황: Day 1 - 2교시 완료, 3교시(CareRequest CRUD) 차례
+## 현재 진행 상황: Day 1 수업 완료, 확인 질문 답변 대기
 - ✅ 1교시: PHP 기초 (`docs/notes/day1-1-php-basics.md`)
 - ✅ 2교시: 프로젝트 생성, 폴더 구조, 요청 흐름, install:api (`docs/notes/day1-2-laravel-project-structure.md`)
-- ⏭ 3교시: 아래 4번부터
+- ✅ 3교시: CareRequest CRUD API, curl 9개 시나리오 통과 (`docs/notes/day1-3-care-request-crud.md`)
+- ⏭ Day 1 확인 질문(1교시 퀴즈 3개 + 아래 4개)의 답을 받아 채점 → Day 2로
 
-Day 1에서 할 일:
-1. ~~`brew install php composer`~~ ✅
-2. ~~`composer create-project laravel/laravel care-match`~~ ✅
-3. ~~`php artisan install:api`~~ ✅ (HasApiTokens trait 추가는 Day 4에서)
-4. `php artisan make:model CareRequest -mcr --api`
-5. 작성할 코드
-   - migration: id, patient_name(50), location, start_date, end_date, status(default PENDING), timestamps
-   - model: `$fillable = [patient_name, location, start_date, end_date]` (status는 일부러 제외), `$attributes = ['status' => 'PENDING']`
-   - controller: index(latest), store(validate, 201), show(Route Model Binding), update(sometimes 검증), destroy(204)
-   - routes/api.php: `Route::apiResource('care-requests', CareRequestController::class);`
-6. `php artisan migrate`, `php artisan serve`, curl로 테스트 (`Accept: application/json` 헤더 필수)
-7. 확인 질문: $fillable의 이유 / Route Model Binding 원리 / Accept 헤더 차이 / Spring이라면 어떻게 만들었을지
+Day 1 확인 질문: $fillable의 이유 / Route Model Binding 원리 / Accept 헤더 차이 / Spring이라면 어떻게 만들었을지
+
+Day 2에서 이어갈 숙제
+- update에서 날짜 앞뒤 검증이 빠져 있음 → FormRequest로 분리하며 개선
+- index를 `get()` → `paginate()`로, 정렬 기준에 id 추가
+- 한글 JSON 이스케이프(`JSON_UNESCAPED_UNICODE`)는 선택 사항
 
 ## 진행 방식
 - 코드를 대신 다 짜주기보다, 단계별로 같이 만들고 주석으로 Spring 대응 개념을 달아준다.

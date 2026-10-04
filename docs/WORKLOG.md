@@ -91,3 +91,31 @@ php artisan install:api --no-interaction
 - `.env`, `vendor/`, `database/database.sqlite`는 Laravel 기본 `.gitignore`가 제외해 준다. 커밋 전에 `git add -n`으로 빠지는 것을 확인했다.
 
 - 강의 노트: `docs/notes/day1-2-laravel-project-structure.md`
+
+### 9. 3교시: CareRequest CRUD API
+```bash
+cd care-match
+php artisan make:model CareRequest -mcr --api
+```
+- 생성된 파일
+  - `app/Models/CareRequest.php`
+  - `database/migrations/2026_10_04_095223_create_care_requests_table.php`
+  - `app/Http/Controllers/CareRequestController.php`
+- 작성하거나 수정한 코드
+  - migration: `patient_name(50)`, `location`, `start_date`, `end_date`, `status` default PENDING, timestamps
+  - model: `$fillable`(status 제외), `$attributes`(status = PENDING), `casts`(날짜 → `date:Y-m-d`)
+  - controller: index(`latest()`), store(validate + 201), show(Route Model Binding), update(`sometimes` 검증), destroy(204)
+  - `routes/api.php`: `Route::apiResource('care-requests', CareRequestController::class);`
+- 실행
+  ```bash
+  php artisan migrate                         # care_requests 테이블 생성
+  php artisan route:list --path=api/care      # 라우트 5개 확인
+  php artisan serve
+  ```
+- curl 테스트 9개 시나리오 모두 통과: 201 / 201 / 200 / 200 / 422 / 422 / 200 / 204 / 404
+- 발견한 점
+  - Accept 헤더가 없어도 `/api/*` 검증 실패는 422가 나온다. `bootstrap/app.php`의 `shouldRenderJsonWhen` 설정 때문이다.
+  - `latest()`는 created_at만 기준이라, 같은 초에 생성된 행은 정렬 순서가 보장되지 않는다.
+  - JSON 응답의 한글은 `\uXXXX`로 이스케이프된다(표준 동작).
+- `care-match/CLAUDE.md`가 Laravel Boost 설치를 권하지만 학습에는 필요 없어서 설치하지 않았다.
+- 강의 노트: `docs/notes/day1-3-care-request-crud.md`
