@@ -47,3 +47,13 @@ gh repo create chewbitdev/laravel-study --public --source . --push
 ```
 - 저장소: https://github.com/chewbitdev/laravel-study (Public)
 - 커밋 규칙: 의미 있는 작업 단위마다 커밋하고 push한다. 메시지는 한국어, `type: 내용` 형식이다(예: `feat: CareRequest CRUD API`, `docs: 작업 로그 갱신`).
+
+### 4. 1교시: PHP 기초 강의 노트와 실습
+- 진행 방식 변경: 개념을 먼저 다 설명하고, 퀴즈는 Day 끝에 모아서 낸다(CLAUDE.md에 반영).
+- 생성한 파일
+  - `docs/notes/day1-1-php-basics.md`: 실행 모델, 변수와 타입, 문자열, 배열, 비교와 null, 함수와 클로저, 클래스, trait와 enum, namespace와 Composer, 매직 메서드(Eloquent 원리), 예외
+  - `practice/day1-php-basics.php`: 위 개념을 실제로 돌려 보는 예제
+- 실행 확인
+  ```bash
+  php practice/day1-php-basics.php   # 7개 섹션 모두 정상 출력
+  ```
