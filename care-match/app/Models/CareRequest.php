@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CareStatus;
 use Illuminate\Database\Eloquent\Model;
 
 // JPA라면 @Entity @Table(name = "care_requests") + CareRequestRepository 두 개가 필요하다.
@@ -23,8 +24,9 @@ class CareRequest extends Model
 
     // new CareRequest() 했을 때 PHP 객체의 기본값 (필드 초기값 private String status = "PENDING";)
     // DB default만 있으면 저장 직후 $careRequest->status가 null로 보이므로 모델에도 둔다.
+    // $attributes에는 DB에 들어갈 "원시 값"을 넣어야 해서 ->value 를 쓴다.
     protected $attributes = [
-        'status' => 'PENDING',
+        'status' => CareStatus::Pending->value,
     ];
 
     // 컬럼 값을 꺼낼 때 타입 변환 (JPA의 LocalDate 매핑 / AttributeConverter)
@@ -33,6 +35,7 @@ class CareRequest extends Model
         return [
             'start_date' => 'date:Y-m-d',   // Carbon 날짜 객체로, JSON에는 2026-10-12 형식으로
             'end_date' => 'date:Y-m-d',
+            'status' => CareStatus::class,  // 'PENDING' ↔ CareStatus::Pending (@Enumerated(EnumType.STRING))
         ];
     }
 }

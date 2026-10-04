@@ -2,70 +2,67 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CareStatus;
+use App\Http\Requests\StoreCareRequestRequest;
+use App\Http\Requests\UpdateCareRequestRequest;
+use App\Http\Resources\CareRequestResource;
 use App\Models\CareRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 // @RestController + @RequestMapping("/api/care-requests")
 // URL 매핑은 어노테이션이 아니라 routes/api.php의 Route::apiResource()가 한다.
 class CareRequestController extends Controller
 {
-    // GET /api/care-requests  (@GetMapping)
-    public function index()
+    // GET /api/care-requests?status=PENDING&per_page=10&page=2
+    // (@GetMapping + @RequestParam + Pageable)
+    public function index(Request $request): AnonymousResourceCollection
     {
-        // SELECT * FROM care_requests ORDER BY created_at DESC
-        // repository.findAll(Sort.by(DESC, "createdAt")) 와 같다.
-        // 모델/컬렉션을 return하면 Laravel이 알아서 JSON으로 직렬화한다 (Jackson 역할).
-        return CareRequest::latest()->get();
-    }
-
-    // POST /api/care-requests  (@PostMapping + @Valid @RequestBody)
-    public function store(Request $request): JsonResponse
-    {
-        // Bean Validation(@NotBlank, @Size...)을 배열 규칙으로 쓴다.
-        // 실패하면 여기서 바로 예외 → 422 + 에러 JSON 응답 (MethodArgumentNotValidException 자동 처리)
-        // 반환값은 "검증을 통과한 필드만" 담긴 배열이다.
-        $validated = $request->validate([
-            'patient_name' => ['required', 'string', 'max:50'],
-            'location' => ['required', 'string', 'max:255'],
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+        // 쿼리스트링도 validate로 검증할 수 있다.
+        // Rule::enum: CareStatus에 있는 값만 허용 (PENDING, MATCHED, ...)
+        $filters = $request->validate([
+            'status' => ['sometimes', Rule::enum(CareStatus::class)],
+            'per_page' => ['sometimes', 'integer', 'between:1,100'],
         ]);
 
-        // INSERT. $fillable에 있는 키만 들어간다. (repository.save(new CareRequest(...)))
-        $careRequest = CareRequest::create($validated);
+        $careRequests = CareRequest::query()
+            // when(조건, 콜백): 조건이 참일 때만 where를 붙인다 (동적 쿼리, QueryDSL의 BooleanBuilder 느낌)
+            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->latest()          // ORDER BY created_at DESC
+            ->latest('id')      // 같은 초에 생성된 행의 순서를 보장 (Day 1에서 발견한 문제)
+            ->paginate($filters['per_page'] ?? 15);   // LIMIT/OFFSET + COUNT 쿼리, ?page=N 은 자동으로 읽음
 
-        // ResponseEntity.status(201).body(careRequest)
-        return response()->json($careRequest, 201);
+        // 컬렉션 → Resource 배열. 페이지 정보(meta, links)가 자동으로 붙는다.
+        return CareRequestResource::collection($careRequests);
     }
 
-    // GET /api/care-requests/{care_request}  (@GetMapping("/{id}"))
-    // Route Model Binding: URL의 {care_request} 값(id)으로 Laravel이 미리 조회해서 넣어준다.
-    // = repository.findById(id).orElseThrow(() -> new NotFoundException()) 를 자동으로.
-    // 없는 id면 컨트롤러에 들어오기도 전에 404.
-    public function show(CareRequest $careRequest)
+    // POST /api/care-requests
+    // 파라미터 타입이 FormRequest → 메서드 실행 전에 authorize() + rules() 검증이 끝나 있다.
+    public function store(StoreCareRequestRequest $request): CareRequestResource
     {
-        return $careRequest;
+        // validated(): 검증을 통과한 필드만 (Day 1의 $validated와 같음)
+        $careRequest = CareRequest::create($request->validated());
+
+        // 방금 생성된 모델($careRequest->wasRecentlyCreated === true)을 Resource로 반환하면
+        // Laravel이 상태 코드를 자동으로 201로 정한다.
+        return new CareRequestResource($careRequest);
+    }
+
+    // GET /api/care-requests/{care_request}  (Route Model Binding)
+    public function show(CareRequest $careRequest): CareRequestResource
+    {
+        return new CareRequestResource($careRequest);
     }
 
     // PUT/PATCH /api/care-requests/{care_request}
-    public function update(Request $request, CareRequest $careRequest)
+    public function update(UpdateCareRequestRequest $request, CareRequest $careRequest): CareRequestResource
     {
-        // sometimes: "요청에 그 필드가 있을 때만" 검증한다 → 부분 수정(PATCH) 가능.
-        // 날짜 앞뒤 관계(after_or_equal)는 한쪽만 올 수도 있어서 여기서는 생략 (Day 2에서 개선)
-        $validated = $request->validate([
-            'patient_name' => ['sometimes', 'required', 'string', 'max:50'],
-            'location' => ['sometimes', 'required', 'string', 'max:255'],
-            'start_date' => ['sometimes', 'required', 'date'],
-            'end_date' => ['sometimes', 'required', 'date'],
-        ]);
-
-        // UPDATE ... SET (바뀐 컬럼만) WHERE id = ?
         // JPA 더티 체킹과 달리 save/update를 명시적으로 호출해야 저장된다.
-        $careRequest->update($validated);
+        $careRequest->update($request->validated());
 
-        return $careRequest;
+        return new CareRequestResource($careRequest);
     }
 
     // DELETE /api/care-requests/{care_request}
@@ -73,7 +70,6 @@ class CareRequestController extends Controller
     {
         $careRequest->delete();
 
-        // ResponseEntity.noContent().build()
         return response()->noContent();   // 204
     }
 }
