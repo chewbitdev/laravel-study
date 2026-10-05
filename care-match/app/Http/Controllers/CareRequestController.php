@@ -7,6 +7,7 @@ use App\Http\Requests\StoreCareRequestRequest;
 use App\Http\Requests\UpdateCareRequestRequest;
 use App\Http\Resources\CareRequestResource;
 use App\Models\CareRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -42,8 +43,15 @@ class CareRequestController extends Controller
     // 파라미터 타입이 FormRequest → 메서드 실행 전에 authorize() + rules() 검증이 끝나 있다.
     public function store(StoreCareRequestRequest $request): CareRequestResource
     {
-        // validated(): 검증을 통과한 필드만 (Day 1의 $validated와 같음)
-        $careRequest = CareRequest::create($request->validated());
+        $guardian = User::findOrFail($request->validated('guardian_id'));
+
+        // 관계를 통해 생성: guardian_id가 자동으로 채워진다.
+        // guardian_id가 $fillable에 없어도 된다 (관계 메서드가 직접 설정하기 때문)
+        // JPA: careRequest.setGuardian(guardian); repository.save(careRequest);
+        // safe()->except(): 검증된 값 중 guardian_id만 빼고
+        $careRequest = $guardian->careRequests()->create(
+            $request->safe()->except('guardian_id')
+        );
 
         // 방금 생성된 모델($careRequest->wasRecentlyCreated === true)을 Resource로 반환하면
         // Laravel이 상태 코드를 자동으로 201로 정한다.

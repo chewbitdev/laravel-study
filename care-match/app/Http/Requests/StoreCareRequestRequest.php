@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 // 요청 DTO + @Valid 를 한 클래스로 합친 것.
 // 컨트롤러 파라미터에 이 타입을 쓰면, 컨트롤러 메서드가 실행되기 "전에" 검증이 끝난다.
@@ -20,6 +22,9 @@ class StoreCareRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // 아직 로그인이 없으므로 보호자 id를 본문으로 받는다. (Day 4에서 $request->user()로 교체)
+            // exists:users,id + where(role) → "users 테이블에 있고, 역할이 보호자인 id"만 허용
+            'guardian_id' => ['required', 'integer', Rule::exists('users', 'id')->where('role', UserRole::Guardian->value)],
             'patient_name' => ['required', 'string', 'max:50'],
             'location' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'date', 'after_or_equal:today'],
@@ -31,6 +36,7 @@ class StoreCareRequestRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'guardian_id' => '보호자',
             'patient_name' => '환자 이름',
             'location' => '장소',
             'start_date' => '시작일',

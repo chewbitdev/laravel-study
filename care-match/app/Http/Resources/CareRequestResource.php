@@ -15,6 +15,12 @@ class CareRequestResource extends JsonResource
         // $this->id 는 감싸고 있는 모델의 속성으로 위임된다 ($this->resource->id)
         return [
             'id' => $this->id,
+            // 관계를 속성처럼 접근하면 그 순간 SELECT가 실행된다 (지연 로딩, JPA의 LAZY)
+            // ⚠️ 목록에서 이 Resource를 15번 만들면 쿼리도 15번 → 3교시 N+1에서 다룬다
+            'guardian' => [
+                'id' => $this->guardian->id,
+                'name' => $this->guardian->name,
+            ],
             'patient_name' => $this->patient_name,
             'location' => $this->location,
             'start_date' => $this->start_date->toDateString(),

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -25,12 +26,24 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'name' => fake('ko_KR')->name(),
             'email' => fake()->unique()->safeEmail(),
+            'role' => UserRole::Guardian,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    // 상태(state): 기본값 일부를 덮어쓰는 변형. User::factory()->caregiver()->create()
+    public function guardian(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => UserRole::Guardian]);
+    }
+
+    public function caregiver(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => UserRole::Caregiver]);
     }
 
     /**
