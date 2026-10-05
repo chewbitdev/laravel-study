@@ -146,3 +146,44 @@ php artisan make:resource CareRequestResource
 - curl 테스트 9개 시나리오 모두 통과: 201 자동 / 422(한글 필드명) / 페이징 meta / 상태 필터 / 422(enum) / 422(after 훅) / 422(형식 오류, 500 아님) / 200 / status 무시
 - 발견한 점: `config/app.php`의 timezone이 UTC라서 `today()`가 한국 날짜보다 하루 늦을 수 있다(한국 시간 00~09시). → Day 3에서 정책을 결정한다.
 - 강의 노트: `docs/notes/day2-1-request-response-layer.md`
+
+### 2. 2교시: Eloquent 관계 (users role, applications)
+```bash
+php artisan make:migration add_role_to_users_table --table=users
+php artisan make:migration add_guardian_id_to_care_requests_table --table=care_requests
+php artisan make:model Application -mf             # 모델 + 마이그레이션 + 팩토리
+php artisan make:factory CareRequestFactory --model=CareRequest
+php artisan make:controller ApplicationController
+php artisan make:request StoreApplicationRequest
+php artisan make:resource ApplicationResource
+```
+- 새로 만든 파일
+  - enum: `app/Enums/UserRole.php`(GUARDIAN, CAREGIVER), `app/Enums/ApplicationStatus.php`(PENDING, ACCEPTED, REJECTED)
+  - migration: users.role, care_requests.guardian_id(FK, NOT NULL, CASCADE), applications 테이블(FK 2개, UNIQUE(care_request_id, caregiver_id))
+  - model: `Application`(careRequest, caregiver belongsTo)
+  - factory: `CareRequestFactory`, `ApplicationFactory`
+  - API: `ApplicationController`(index, store), `StoreApplicationRequest`, `ApplicationResource`
+- 수정한 파일
+  - model: `User`(role cast, careRequests/applications hasMany), `CareRequest`(HasFactory, guardian belongsTo, applications hasMany)
+  - factory: `UserFactory`에 role, ko_KR 이름, guardian()/caregiver() state 추가
+  - seeder: `DatabaseSeeder`에 고정 계정 2개, 보호자 5, 간병인 10, 요청, 지원 생성
+  - API: `StoreCareRequestRequest`에 guardian_id 검증 추가, `CareRequestController@store`를 관계로 생성하도록 변경, `CareRequestResource`에 guardian 추가
+  - routes: `Route::apiResource('care-requests.applications', ...)->only(['index', 'store'])`
+
+#### 🔥 마이그레이션 실패와 해결
+- 기존 데이터 5건이 있는 상태에서 `php artisan migrate` 실행
+  - `add_role_to_users_table` 성공
+  - `add_guardian_id_to_care_requests_table` **실패**: `NOT NULL constraint failed: __temp__care_requests.guardian_id`
+- 실패 후 상태: 마이그레이션은 Pending인데 `guardian_id` 컬럼은 이미 생성돼 있었다(반쯤 적용됨). 다시 migrate하면 "컬럼이 이미 있다" 에러가 난다.
+- 해결(개발 DB):
+  ```bash
+  php artisan migrate:fresh --seed   # 전체 DROP 후 재실행 + 시더
+  ```
+- 교훈: 운영 DB에는 ① nullable 추가 → ② 데이터 채우기 → ③ NOT NULL 변경으로, 가능하면 파일도 나눠서 적용한다. MySQL은 DDL이 자동 커밋되어 롤백되지 않는다.
+
+#### 결과 확인
+- 시더 결과: users 17(보호자 6, 간병인 11), care_requests 12, applications 35
+- tinker로 관계 탐색: `$r->guardian->name`, `$r->applications`, `careRequests()`(HasMany)와 `careRequests`(Collection)의 차이 확인
+- curl 9개 시나리오 통과: 201 / 422(역할) / 200 / 201 / 422(중복) / 422(역할) / 422(상태) / 404 / DB UNIQUE 예외 + CASCADE 삭제
+- 남은 문제: Resource에서 관계를 지연 로딩 → N+1 (3교시)
+- 강의 노트: `docs/notes/day2-2-eloquent-relationships.md`

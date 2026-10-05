@@ -27,13 +27,15 @@
 - 상태 전이: PENDING → MATCHED → IN_PROGRESS → DONE
 - 핵심: 보호자가 지원자를 수락할 때 트랜잭션 + 비관적 락으로 중복 매칭 방지
 
-## 현재 진행 상황: Day 2 - 1교시 완료, 2교시(Eloquent 관계) 차례
+## 현재 진행 상황: Day 2 - 2교시 완료, 3교시(N+1) 차례
 Day 1 ✅ (노트 `docs/notes/day1-*.md`, 확인 질문 7/7 정답 → `day1-4-review.md`)
 
 Day 2
 - ✅ 1교시: 라우트 심화(개념), FormRequest, API Resource, Enum cast, 페이징과 필터 (`docs/notes/day2-1-request-response-layer.md`)
-- ⏭ 2교시: Eloquent 관계. users에 role 추가, applications 테이블, hasMany/belongsTo, 중첩 라우트
-- ⏭ 3교시: N+1 문제와 `with()` eager loading, 쿼리 로그로 확인
+- ✅ 2교시: users.role, care_requests.guardian_id, applications 테이블, hasMany/belongsTo, Factory/Seeder, 중첩 라우트 지원 API (`docs/notes/day2-2-eloquent-relationships.md`)
+- ⏭ 3교시: N+1 문제. CareRequestResource(guardian)와 ApplicationResource(caregiver)가 지연 로딩 중 → 쿼리 로그로 세어 보고 `with()`, `withCount()`, `whenLoaded()`, `preventLazyLoading()`으로 개선
+
+현재 DB 상태: `migrate:fresh --seed` 기준. 고정 계정은 guardian@example.com(id 1), caregiver@example.com(id 2), 비밀번호 password. 데이터를 다시 만들려면 `php artisan migrate:fresh --seed`
 - Day 2가 끝나면 확인 질문 3~4개
 
 미뤄 둔 결정
