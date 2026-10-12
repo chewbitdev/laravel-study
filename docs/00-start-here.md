@@ -12,6 +12,7 @@
 | 순서 | 읽을 문서 | 같이 열어 볼 코드 | 핵심 한 줄 |
 |---|---|---|---|
 | ① | **이 문서** (`docs/00-start-here.md`) | — | 전체 그림부터 잡기 |
+| ①-2 | **`docs/01-file-map.md`** (파일 지도) | `care-match/` 폴더를 에디터 왼쪽 탐색기에 펼쳐 놓고 | 어떤 파일이 무슨 일을 하는지 |
 | ② | `docs/notes/day1-1-php-basics.md` | `practice/day1-php-basics.php` | `$변수`, `->`, `::`, 배열 = Map |
 | ③ | `docs/notes/day1-2-laravel-project-structure.md` | `care-match/` 폴더 구조, `bootstrap/app.php` | 폴더마다 하는 일 |
 | ④ | `docs/notes/day1-3-care-request-crud.md` | migration → Model → Controller → `routes/api.php` | API 하나가 만들어지는 과정 |

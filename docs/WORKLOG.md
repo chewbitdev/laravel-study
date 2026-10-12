@@ -199,3 +199,9 @@ php artisan make:resource ApplicationResource
   - **처음부터 세팅하는 절차**: GitHub 저장소를 임시 폴더에 새로 clone했다 → `.env`, `vendor/`, DB 파일 없음 확인 → `composer install` → `cp .env.example .env` → `key:generate` → `touch database/database.sqlite` → `migrate --seed` → `serve` → API 응답 정상(total 14). 확인 후 임시 폴더 삭제
   - `.env.example`의 DB 항목(주석 처리된 MySQL 설정)과 `pdo_mysql` 드라이버 설치 여부 확인
 - MySQL 전환(6장)은 아직 실습하지 않았다. 실제로 할 때 문서를 업데이트한다.
+
+### 2. 파일 지도 `docs/01-file-map.md`
+- 목적: "어떤 파일이 무슨 파일인지 모르겠다"를 해결하기
+- 만든 방법: `git ls-files`로 실제 추적 파일 목록을 뽑고, git에 없는 로컬 전용 파일(`.env`, `vendor/`, `database.sqlite`, `laravel.log`)을 확인한 뒤 모든 파일에 설명을 달았다.
+- 내용: ⭐(직접 만든 파일) / 📄(Laravel 기본, 가끔 봄) / 💤(거의 안 봄) / 🔒(로컬 전용) 표시, 폴더별 트리와 설명, 파일 협력 그림, API 하나를 파일 10개로 따라가기, 이름 규칙, 새 기능을 만드는 파일 순서, 회사 프로젝트에서 활용하는 법
+- `00-start-here.md`의 읽는 순서에 ①-2로 추가했다.

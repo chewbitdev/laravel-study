@@ -81,3 +81,4 @@ class CareRequestController extends Controller
         return response()->noContent();   // 204
     }
 }
+
