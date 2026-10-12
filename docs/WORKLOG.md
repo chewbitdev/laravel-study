@@ -187,3 +187,15 @@ php artisan make:resource ApplicationResource
 - curl 9개 시나리오 통과: 201 / 422(역할) / 200 / 201 / 422(중복) / 422(역할) / 422(상태) / 404 / DB UNIQUE 예외 + CASCADE 삭제
 - 남은 문제: Resource에서 관계를 지연 로딩 → N+1 (3교시)
 - 강의 노트: `docs/notes/day2-2-eloquent-relationships.md`
+
+---
+
+## 2026-10-12 (월) 복습 가이드 작성
+
+### 1. 쉬운 복습 가이드 `docs/00-start-here.md`
+- 내용: 문서 읽는 순서, 서버와 DB 개념(식당 비유), `.env` 로컬 설정, 처음부터 세팅하는 절차, SQLite → MySQL 전환, 다른 기기와 운영 연결, API 목록, 문제 해결 표, 명령어 모음, 체크리스트
+- 가이드에 넣기 전에 검증한 것
+  - DB 조회 명령: `php artisan db:show`, `php artisan db:table care_requests`, `sqlite3 -header -column database/database.sqlite "..."` 모두 동작
+  - **처음부터 세팅하는 절차**: GitHub 저장소를 임시 폴더에 새로 clone했다 → `.env`, `vendor/`, DB 파일 없음 확인 → `composer install` → `cp .env.example .env` → `key:generate` → `touch database/database.sqlite` → `migrate --seed` → `serve` → API 응답 정상(total 14). 확인 후 임시 폴더 삭제
+  - `.env.example`의 DB 항목(주석 처리된 MySQL 설정)과 `pdo_mysql` 드라이버 설치 여부 확인
+- MySQL 전환(6장)은 아직 실습하지 않았다. 실제로 할 때 문서를 업데이트한다.
