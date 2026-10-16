@@ -19,6 +19,7 @@
 | ⑤ | `docs/notes/day1-4-review.md` | — | Day 1 퀴즈 복습 |
 | ⑥ | `docs/notes/day2-1-request-response-layer.md` | `app/Http/Requests/`, `app/Http/Resources/`, `app/Enums/` | 요청 검증과 응답 모양 분리 |
 | ⑦ | `docs/notes/day2-2-eloquent-relationships.md` | `app/Models/` 3개, `database/migrations/` | 테이블끼리 연결 |
+| ⑧ | `docs/notes/spring-00-setup-and-roadmap.md` | `care-match-spring/` | 같은 API를 Spring Boot로 **직접** 만들어 보기 |
 | 📒 | `docs/WORKLOG.md` | — | 실제로 친 명령어와 에러 기록 (필요할 때 찾아보기) |
 
 > 💡 처음 읽을 때는 노트의 "Spring 비교" 표는 건너뛰어도 된다. 두 번째 읽을 때 보면 훨씬 잘 들어온다.
@@ -395,3 +396,4 @@ php artisan config:clear                # 설정 캐시 지우기
 | Day 3 | 마이그레이션 심화, 시간대 결정, (권장) MySQL로 전환 |
 | Day 4 | 로그인(Sanctum), 미들웨어, 매칭 수락(트랜잭션 + 비관적 락) |
 | Day 5 | Queue/Job, 스케줄러, 테스트, README와 ERD 문서화 |
+| 병행 | `care-match-spring/`에 같은 기능을 직접 구현 (로드맵 1~9단계) |

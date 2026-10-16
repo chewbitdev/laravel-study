@@ -205,3 +205,46 @@ php artisan make:resource ApplicationResource
 - 만든 방법: `git ls-files`로 실제 추적 파일 목록을 뽑고, git에 없는 로컬 전용 파일(`.env`, `vendor/`, `database.sqlite`, `laravel.log`)을 확인한 뒤 모든 파일에 설명을 달았다.
 - 내용: ⭐(직접 만든 파일) / 📄(Laravel 기본, 가끔 봄) / 💤(거의 안 봄) / 🔒(로컬 전용) 표시, 폴더별 트리와 설명, 파일 협력 그림, API 하나를 파일 10개로 따라가기, 이름 규칙, 새 기능을 만드는 파일 순서, 회사 프로젝트에서 활용하는 법
 - `00-start-here.md`의 읽는 순서에 ①-2로 추가했다.
+
+---
+
+## 2026-10-16 (금) Spring Boot 버전 골격 생성
+
+### 1. 환경 확인
+```bash
+java -version                 # 21.0.7 (그 밖에 23, 11도 설치되어 있음)
+/usr/libexec/java_home -V
+which gradle mvn              # 둘 다 없음 → 프로젝트에 포함되는 래퍼(gradlew)를 사용
+```
+- Spring Initializr 기본값: Boot 4.1.1, Java 17 → Java 21로 선택
+
+### 2. 프로젝트 생성 — 🔥 버전 표기 실수
+- 처음 요청: `bootVersion=4.1.1.RELEASE` (Initializr 메타데이터의 id를 그대로 사용)
+  - Gradle 생성: 서버 500 에러 (`Error creating bean with name 'gradleBuild'`)
+  - Maven 생성: zip은 받았지만 `./mvnw package` 실패 → `Could not find artifact spring-boot-starter-parent:pom:4.1.1.RELEASE`
+- 원인: Maven Central에 올라간 버전 이름은 `4.1.1`이다(`.RELEASE` 없음). 처음에 Initializr 서버 장애로 잘못 판단했다가, Maven Central을 조회해서 원인을 바로잡았다.
+- 해결: `bootVersion=4.1.1`로 Gradle 프로젝트를 다시 생성하고, 잘못 만든 Maven 폴더는 삭제했다.
+```bash
+curl -s "https://start.spring.io/starter.zip?type=gradle-project&language=java&bootVersion=4.1.1&javaVersion=21&groupId=com.study&artifactId=care-match-spring&name=care-match-spring&packageName=com.study.carematch&baseDir=care-match-spring&dependencies=web,data-jpa,validation,flyway,h2,lombok" -o cms.zip
+unzip -q cms.zip && rm cms.zip
+```
+- 라이브러리 버전: Spring Framework 7.0.9, Hibernate 7.4.5, Flyway 12.4.0, Jackson 3.1 (`tools.jackson`), H2 2.4.240
+
+### 3. 골격만 남기기 (학습 원칙 적용)
+- "학습용 프로젝트는 빈 골격까지만, 기능은 직접 구현"하는 원칙에 따라, 처음에 작성했던 Flyway 마이그레이션 SQL 5개는 **삭제**했다(직접 작성할 부분).
+- 남긴 것
+  - `application.properties`: H2 파일 DB, `ddl-auto=validate`, `open-in-view=false`, H2 콘솔, JSON snake_case, 페이징(`?page=1`부터, `per_page`, 15/100)
+  - 빈 패키지 7개(domain, repository, service, controller, dto, exception, config)와 역할만 적은 `package-info.java`
+  - `db/migration/.gitkeep`
+  - `.gitignore`에 `data/`(H2 DB 파일) 추가
+### 4. 실행 확인
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+./gradlew build -x test   # 성공
+./gradlew test            # 성공 (contextLoads)
+./gradlew bootRun         # Started in 1.779s, Tomcat 8080
+curl localhost:8080/            # 404 (API 없음, 정상)
+curl -L localhost:8080/h2-console   # 200
+```
+- Flyway 로그: `No migrations found` (V1을 직접 만들기 전이라 정상)
+- 문서: `docs/notes/spring-00-setup-and-roadmap.md` (골격 설명 + 직접 만들기 로드맵 9단계, 정답 코드 없이 힌트와 키워드만)

@@ -30,10 +30,12 @@ laravel-study/                 ← GitHub 저장소 (chewbitdev/laravel-study)
 │       ├── day1-3-care-request-crud.md
 │       ├── day1-4-review.md
 │       ├── day2-1-request-response-layer.md
-│       └── day2-2-eloquent-relationships.md
+│       ├── day2-2-eloquent-relationships.md
+│       └── spring-00-setup-and-roadmap.md   ⭐ Spring 버전 골격 설명 + 직접 만들기 로드맵
 ├── practice/
 │   └── day1-php-basics.php    ⭐ PHP 문법 연습 파일 (php practice/day1-php-basics.php)
-└── care-match/                ⭐ 진짜 Laravel 프로젝트 (아래 2장)
+├── care-match/                ⭐ 진짜 Laravel 프로젝트 (아래 2장)
+└── care-match-spring/         ⭐ 같은 API를 Spring Boot로 직접 만들어 보는 프로젝트 (아래 14장, 지금은 빈 골격)
 ```
 
 **구분할 것**: `laravel-study/`는 "공부 노트 + 프로젝트"를 담은 상자이고, **실제 Laravel 앱은 `care-match/` 폴더 하나**다. `php artisan` 명령은 항상 `care-match/` 안에서 실행한다.
@@ -314,3 +316,36 @@ php artisan route:list --path=api/review     # ⑦ 등록 확인 → curl로 테
 4. **`app/Models/`**: 테이블끼리의 관계를 본다.
 5. **`.env.example`**: 어떤 외부 서비스(DB, Redis, 메일, 결제)에 연결하는지 본다.
 6. **`composer.json`**: Laravel 버전과 추가 라이브러리를 본다.
+
+---
+
+## 14. Spring 버전: `care-match-spring/` (빈 골격)
+
+> 자세한 설명과 직접 만들 순서는 `docs/notes/spring-00-setup-and-roadmap.md`
+
+```
+care-match-spring/
+├── build.gradle                          📄 의존성, Java 버전 (= composer.json)
+├── settings.gradle                       💤 프로젝트 이름
+├── gradlew, gradlew.bat, gradle/wrapper/ 💤 Gradle 실행기 (= artisan 같은 도구)
+├── HELP.md                               💤 Initializr 안내문 (git 제외)
+├── .gitignore, .gitattributes            💤
+├── src/main/java/com/study/carematch/
+│   ├── CareMatchSpringApplication.java   📄 main(). 앱 시작점 (= public/index.php + bootstrap/app.php)
+│   ├── domain/package-info.java          ⭐ 직접 만들 곳: 엔티티, enum        (= app/Models, app/Enums)
+│   ├── repository/package-info.java      ⭐ 직접 만들 곳: JpaRepository       (Laravel에 없음)
+│   ├── service/package-info.java         ⭐ 직접 만들 곳: 비즈니스 로직        (Laravel에선 Controller/after())
+│   ├── controller/package-info.java      ⭐ 직접 만들 곳: @RestController     (= Controllers + routes/api.php)
+│   ├── dto/package-info.java             ⭐ 직접 만들 곳: 요청/응답 record     (= Requests + Resources)
+│   ├── exception/package-info.java       ⭐ 직접 만들 곳: @RestControllerAdvice (= withExceptions)
+│   └── config/package-info.java          ⭐ 직접 만들 곳: 초기 데이터 등       (= Seeder, Provider)
+├── src/main/resources/
+│   ├── application.properties            ⭐ 설정 (= .env + config/*.php). Laravel과 응답 모양을 맞추는 설정이 들어 있음
+│   ├── db/migration/.gitkeep             ⭐ 직접 만들 곳: V1__...sql ~       (= database/migrations)
+│   ├── static/, templates/               💤 화면용 (API만 만드므로 안 씀)
+├── src/test/java/.../CareMatchSpringApplicationTests.java  📄 앱이 뜨는지 확인하는 기본 테스트 (= tests/)
+├── data/care-match.mv.db                 🔒 H2 DB 파일 (= database/database.sqlite)
+├── build/                                🔒 컴파일 결과, jar
+└── .gradle/                              🔒 Gradle 캐시
+```
+`package-info.java`에는 "이 패키지가 무슨 역할인지, Laravel의 어디에 해당하는지"만 주석으로 적혀 있다. 이 패키지들 안에 클래스를 직접 만들어 나간다.

@@ -30,6 +30,12 @@
 ## 현재 진행 상황: Day 2 - 2교시 완료, 복습 중 → 다음은 3교시(N+1)
 - 복습 가이드: `docs/00-start-here.md` (문서 읽는 순서, 서버/DB/.env, 세팅 절차, MySQL 전환). 진도가 나가면 이 가이드의 8장(API 목록), 12장(다음에 배울 것)도 함께 갱신한다.
 - 파일 지도: `docs/01-file-map.md`. **파일을 새로 만들거나 지우면 이 지도도 함께 갱신한다.**
+
+### Spring Boot 버전 (`care-match-spring/`)
+- 같은 API를 Spring Boot 4.1.1 / Java 21 / Gradle / H2 파일 / Flyway로 **사용자가 직접** 구현하는 비교 학습용 프로젝트
+- 현재: 실행되는 빈 골격(설정 + 빈 패키지)만 있음. 로드맵은 `docs/notes/spring-00-setup-and-roadmap.md` (1~9단계)
+- **규칙: 이 프로젝트의 엔티티, SQL, API 코드는 Claude가 대신 작성하지 않는다.** 사용자가 물어보면 힌트, 방향, 키워드 위주로 답하고, 사용자가 작성한 코드를 리뷰한다. 사용자가 명시적으로 코드를 요청할 때만 예외로 한다.
+- 실행 전 `export JAVA_HOME=$(/usr/libexec/java_home -v 21)` (기본 java가 23일 수 있음)
 Day 1 ✅ (노트 `docs/notes/day1-*.md`, 확인 질문 7/7 정답 → `day1-4-review.md`)
 
 Day 2
